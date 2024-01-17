@@ -60,6 +60,9 @@ def generate_frames():
 
         for index in range(len(object_info)):
             cv2.rectangle(img, object_info[index][0], color=(0, 0, 255), thickness=2)
+            cv2.putText(img, str(object_info[index][1]), (object_info[index][0][0], 
+                                                 object_info[index][0][1] - 20), 
+                                                 cv2.FONT_HERSHEY_SIMPLEX, .5, (0, 0, 255), 2)
 
         frame_count += 1
         fps = round(frame_count / (time.time() - start_time), 2)

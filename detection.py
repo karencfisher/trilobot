@@ -18,6 +18,7 @@ def getObjects(img, objects):
     if len(classIds) != 0:
         for classId, confidence, box in zip(classIds.flatten(), confs.flatten(), bbox):
             className = class_names[classId - 1]
-            if className in objects:
-                objectInfo.append([box, className])
+            # if className in objects:
+            #     objectInfo.append([box, className])
+        objectInfo.append([box, className])
     return objectInfo
