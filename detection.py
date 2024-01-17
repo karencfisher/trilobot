@@ -1,5 +1,5 @@
 import cv2
-threshold = 0.5
+threshold = 0.2
 
 configPath = 'model/ssd_mobilenet_v3_large_coco_2020_01_14.pbtxt'
 weightsPath = 'model/frozen_inference_graph.pb'

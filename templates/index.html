@@ -4,10 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script src="{{url_for('static', filename='control.js')}}" defer></script>
 </head>
 <body>
     <img id="video-stream" src="{{ url_for('video_feed') }}" alt="Video Stream">
     <br>
-    <a href="{{ url_for('remote_controls') }}">Remote Controls</a>
+    <button id="control">Control</button>
+    <br>
+    <div id="status"></div>
 </body>
 </html>

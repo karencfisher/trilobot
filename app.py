@@ -1,10 +1,12 @@
-from flask import Flask, Response, render_template
+from flask import Flask, Response, render_template, request, jsonify
 import cv2
 from picamera.array import PiRGBArray
 from picamera import PiCamera
 import time
 import threading
 from detection import getObjects
+from control import dispatch_command
+import json
 
 app = Flask(__name__)
 
@@ -28,7 +30,6 @@ def initialize_camera():
                 camera_initialized = True
             except Exception as e:
                 print(f"Error initializing camera: {e}")
-                # Handle the error as needed
 
 # Route to load the webpage
 @app.route('/')
@@ -43,7 +44,9 @@ def video_feed():
 # Route for remote controls (you can adapt this as needed)
 @app.route('/controls')
 def remote_controls():
-    return "Remote Controls Page"
+    status = dispatch_command(request.args.get("command"))
+    return jsonify(json.dumps(status))
+    
 
 def generate_frames():
     initialize_camera()
@@ -60,8 +63,8 @@ def generate_frames():
 
         for index in range(len(object_info)):
             cv2.rectangle(img, object_info[index][0], color=(0, 0, 255), thickness=2)
-            cv2.putText(img, str(object_info[index][1]), (object_info[index][0][0], 
-                                                 object_info[index][0][1] - 20), 
+            cv2.putText(img, str(object_info[index][1]), (object_info[index][0][0] + 5, 
+                                                 object_info[index][0][1] + 20), 
                                                  cv2.FONT_HERSHEY_SIMPLEX, .5, (0, 0, 255), 2)
 
         frame_count += 1
