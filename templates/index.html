@@ -9,9 +9,23 @@
 </head>
 <body>
     <img id="video-stream" src="{{ url_for('video_feed') }}" alt="Video Stream">
-    <br>
-    <button id="control">Control</button>
-    <br>
+    <br />
+    <table>
+        <tr>
+            <td></td>
+            <td><img class="direction" id="up" src="static/images/up.png" alt="up arrow"></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td><img class="direction" id="left" src="static/images/left.png" alt="left arrow"></td>
+            <td><img class="direction" id="stop" src="static/images/stop.png" alt="stop button"></td>
+            <td><img class="direction" id="right" src="static/images/right.png" alt="right arrow"></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td><img class="direction" id="down" src="static/images/down.png" alt="down arrow"></td>
+        </tr>
+    </table>
     <div id="status"></div>
 </body>
 </html>

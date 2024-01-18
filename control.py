@@ -2,5 +2,5 @@
 
 
 def dispatch_command(command):
-    return {'result': 'ok'}
+    return {'result': f'going {command}'}
 
