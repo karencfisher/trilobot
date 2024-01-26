@@ -8,8 +8,6 @@
     <script src="static/control.js" defer></script>
 </head>
 <body>
-    <img id="video-stream" src="{{ url_for('video_feed') }}" alt="Video Stream">
-    <br />
     <table>
         <tr>
             <td></td>
@@ -24,6 +22,10 @@
         <tr>
             <td></td>
             <td><img class="direction" id="reverse" src="static/images/down.png" alt="down arrow"></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td><button class="direction" id="exit">Exit</td>
         </tr>
     </table>
     <div id="status"></div>
