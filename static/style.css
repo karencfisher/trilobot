@@ -14,8 +14,14 @@ body {
 
 #control-panel {
     margin-top: 10px;
+    padding-top: 5px;
+    padding-bottom: 5px;
     display: grid;
-    grid-template-columns: repeat(3, 100px);
+    grid-template-columns: repeat(3, 80px);
+    place-content: center;
+    border-style: solid;
+    border-width: 2px;
+    width: 300px;
 }
 
 #status {
@@ -31,4 +37,9 @@ body {
     font-size: 2em;
     background: rgb(255, 255, 255);
     border-radius: 10px;
+}
+
+.control > img {
+    width: 80px;
+    height: 80px;
 }
