@@ -63,8 +63,9 @@ def generate_frames():
     start_time = time.time()
     for frame in camera.capture_continuous(raw_capture, format="bgr", use_video_port=True):
         # perform inference on image
-        raw_img = frame.array
-        img, _ = processImage(raw_img)
+        img = frame.array
+        # raw_img = frame.array
+        # img, _ = processImage(raw_img)
 
         # Markup with frame rate
         frame_count += 1
