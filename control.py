@@ -1,21 +1,12 @@
 from trilobot import *
-import os
-import time
 
 
 def dispatch_command(que, speed):
-    print(f"Start trilobot process {os.getpid()}")
     tbot = Trilobot()
-    print(tbot, que)
     while True:
+        # If there is a command in the queue, dequeue and execute it
         if not que.empty():
-            tbot.set_button_led(2, True)
-            time.sleep(.1)
-            tbot.set_button_led(2, False)
-            time.sleep(.1)
-
             command = que.get()
-            print(f'Command: {command}')
             if command == "exit":
                 tbot.stop()
                 break
@@ -23,17 +14,18 @@ def dispatch_command(que, speed):
                 tbot.forward(speed)
             elif command == "reverse":
                 tbot.backward(speed)
-            elif command == "left":
+            elif command == "turn-left":
                 tbot.turn_left(speed)
-            elif command == "right":
+            elif command == "turn-right":
                 tbot.turn_right(speed)
+            elif command == "left-forward":
+                tbot.curve_forward_left(speed)
+            elif command == "right-forward":
+                tbot.curve_forward_right(speed)
+            elif command == "left-reverse":
+                tbot.curve_backward_left(speed)
+            elif command == "right-reverse":
+                tbot.curve_backward_right(speed)
             else:
                 tbot.stop()
-        else:
-            tbot.set_button_led(3, True)
-            time.sleep(.1)
-            tbot.set_button_led(3, False)
-            time.sleep(.1)
-
-    print("End trilobot process")
 

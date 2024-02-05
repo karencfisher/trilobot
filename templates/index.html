@@ -6,26 +6,46 @@
     <title>Document</title>
     <script src="https://d3js.org/d3.v5.min.js" defer></script>
     <script src="static/control.js" defer></script>
+    <link rel="stylesheet" href="static/style.css">
 </head>
 <body>
-    <img id="video-stream" src="{{ url_for('video_feed') }}" alt="Video Stream">
-    <br />
-    <table>
-        <tr>
-            <td></td>
-            <td><img class="direction" id="forward" src="static/images/up.png" alt="up arrow"></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td><img class="direction" id="left" src="static/images/left.png" alt="left arrow"></td>
-            <td><img class="direction" id="stop" src="static/images/stop.png" alt="stop button"></td>
-            <td><img class="direction" id="right" src="static/images/right.png" alt="right arrow"></td>
-        </tr>
-        <tr>
-            <td></td>
-            <td><img class="direction" id="reverse" src="static/images/down.png" alt="down arrow"></td>
-        </tr>
-    </table>
-    <div id="status"></div>
+    <div>
+        <img id="video-stream" src="{{ url_for('video_feed') }}" alt="Video Stream">
+    </div>
+
+    <div id="control-panel">
+        <div class="control" id="left-forward">
+            <img  id="left-forward" src="static/images/left-forward.png" alt="left-forward">
+        </div>
+        <div class="control" id="forward">
+            <img id="forward" src="static/images/forward.png" alt="forward">
+        </div>
+        <div class="control" id="right-forward">
+            <img id="right-forward" src="static/images/right-forward.png" alt="right-forward">
+        </div>
+
+        <div class="control" id="turn-left">
+            <img id="turn-left" src="static/images/turn-left.png" alt="turn-left">
+        </div>
+        <div class="control" id="stop">
+            <img id="stop" src="static/images/stop.png" alt="left-forward">
+        </div>
+        <div class="control" id="turn-right">
+            <img id="turn-right" src="static/images/turn-right.png" alt="turn-right">
+        </div>
+
+        <div class="control" id="left-reverse">
+            <img id="left-reverse" src="static/images/left-reverse.png" alt="left-reverse">
+        </div>
+        <div class="control" id="reverse">
+            <img id="reverse" src="static/images/reverse.png" alt="reverse">
+        </div>
+        <div class="control" id="right-reverse">
+            <img id="right-reverse" src="static/images/right-reverse.png" alt="right-reverse">
+        </div>        
+    </div>
+
+    <div id="status">ready</div>
+    <div><button class="control" id="exit">Exit</button></div>
 </body>
 </html>

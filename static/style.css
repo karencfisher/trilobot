@@ -1,0 +1,34 @@
+body {
+    background: rgb(200, 200, 200);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+#video-stream {
+    margin-top: 5px;
+    width: 300px;
+    height: 225px;
+}
+
+#control-panel {
+    margin-top: 10px;
+    display: grid;
+    grid-template-columns: repeat(3, 100px);
+}
+
+#status {
+    margin-top: 10px;
+    font-size: 2em;
+    color: red;
+}
+
+#exit {
+    width: 300px;
+    height: 50px;
+    margin-top: 10px;
+    font-size: 2em;
+    background: rgb(255, 255, 255);
+    border-radius: 10px;
+}
