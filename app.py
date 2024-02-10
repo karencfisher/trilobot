@@ -3,7 +3,7 @@ import cv2
 import time
 import threading
 from multiprocessing import Process, Queue, Value
-from detection import getObjects, processImage, video_loop
+from camera import getObjects, processImage, video_loop
 from control import dispatch_command
 import json
 import os
@@ -34,7 +34,7 @@ def initialize_camera():
             global video_que
             video_que = Queue()
             video_flag = Value('i', 1)
-            video_process = Process(target=video_loop, args=(video_que, video_flag))
+            video_process = Process(target=video_loop, args=(video_que, video_flag, True))
             video_process.start()
             camera_initialized = True
 
