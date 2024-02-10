@@ -34,7 +34,7 @@ def initialize_camera():
             global video_que
             video_que = Queue()
             video_flag = Value('i', 1)
-            video_process = Process(target=video_loop, args=(video_que, video_flag, True))
+            video_process = Process(target=video_loop, args=(video_que, video_flag))
             video_process.start()
             camera_initialized = True
 

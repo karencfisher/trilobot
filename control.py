@@ -15,7 +15,7 @@ def dispatch_command(que, speed):
             elif command == "reverse":
                 tbot.backward(speed)
             elif command == "turn-left":
-                tbot.set_motor_speeds()
+                tbot.turn_left(speed)
             elif command == "turn-right":
                 tbot.turn_right(speed)
             elif command == "left-forward":
