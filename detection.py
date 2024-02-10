@@ -1,3 +1,5 @@
+from picamera.array import PiRGBArray
+from picamera import PiCamera
 import cv2
 import time
 threshold = 0.2
@@ -41,3 +43,33 @@ def processImage(img):
     # Anything else we may want to do
 
     return img, object_info
+
+def video_loop(video_que, video_flag, detect=False):
+    frame_count = 0
+    start_time = time.time()
+
+    # Initialize camera
+    camera = PiCamera()
+    camera.resolution = (304, 240)
+    camera.framerate = 32
+    raw_capture = PiRGBArray(camera)
+    time.sleep(.1)
+
+    # loop through frames
+    for frame in camera.capture_continuous(raw_capture, format="bgr", use_video_port=True):
+        if not video_flag.value:
+            break
+        if detect:
+            raw_img = frame.array
+            img, _ = processImage(raw_img)
+        else:
+            img = frame.array
+
+        # Annotate with frame rate
+        frame_count += 1
+        fps = round(frame_count / (time.time() - start_time), 2)
+        cv2.putText(img, str(fps) + " FPS", (20, 20), 
+                        cv2.FONT_HERSHEY_SIMPLEX, .5, (0, 0, 255), 2)
+        
+        video_que.put(img)
+        raw_capture.truncate(0)

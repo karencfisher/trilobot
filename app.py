@@ -1,11 +1,9 @@
 from flask import Flask, Response, render_template, request, jsonify
 import cv2
-from picamera.array import PiRGBArray
-from picamera import PiCamera
 import time
 import threading
-from multiprocessing import Process, Queue
-from detection import getObjects, processImage
+from multiprocessing import Process, Queue, Value
+from detection import getObjects, processImage, video_loop
 from control import dispatch_command
 import json
 import os
@@ -16,8 +14,9 @@ app = Flask(__name__)
 # Initialize the camera only once
 camera_initialized = False
 camera_lock = threading.Lock()
-camera = None
-raw_capture = None
+video_process = None
+video_que = None
+video_flag = None
 
 # Controller globals
 SPEED = 0.7
@@ -30,16 +29,14 @@ def initialize_camera():
     global camera_initialized
     with camera_lock:
         if not camera_initialized:
-            try:
-                global camera
-                camera = PiCamera()
-                camera.resolution = (300, 225)
-                camera.framerate = 32
-                global raw_capture
-                raw_capture = PiRGBArray(camera)
-                camera_initialized = True
-            except Exception as e:
-                print(f"Error initializing camera: {e}")
+            global video_flag
+            global video_process
+            global video_que
+            video_que = Queue()
+            video_flag = Value('i', 1)
+            video_process = Process(target=video_loop, args=(video_que, video_flag))
+            video_process.start()
+            camera_initialized = True
 
 def initialize_robot(speed):
     # Lock to only allow a single thread to run this code at one time
@@ -59,19 +56,11 @@ def initialize_robot(speed):
 
 def generate_frames():
     initialize_camera()
-    frame_count = 0
-    start_time = time.time()
-    for frame in camera.capture_continuous(raw_capture, format="bgr", use_video_port=True):
-        # perform inference on image
-        # img = frame.array
-        raw_img = frame.array
-        img, _ = processImage(raw_img)
-
-        # Markup with frame rate
-        frame_count += 1
-        fps = round(frame_count / (time.time() - start_time), 2)
-        cv2.putText(img, str(fps) + " FPS", (20, 20), 
-                        cv2.FONT_HERSHEY_SIMPLEX, .5, (0, 0, 255), 2)      
+    time.sleep(.1)
+    while video_flag.value:
+        if video_que is None or video_que.empty():
+            continue
+        img = video_que.get(False)    
 
         # Encode the frame as JPEG
         _, jpeg_encoded = cv2.imencode('.jpg', img)
@@ -79,10 +68,8 @@ def generate_frames():
 
         # Yield the frame data as bytes
         yield (b'--frame\r\n'
-               b'Content-Type: image/jpeg\r\n\r\n' + frame_data + b'\r\n')
-
-        # Clear the stream for the next frame
-        raw_capture.truncate(0)
+            b'Content-Type: image/jpeg\r\n\r\n' + frame_data + b'\r\n')
+    video_process.join()
 
 # Route to load the webpage
 @app.route('/')
@@ -104,6 +91,7 @@ def remote_controls():
         command_que.put("exit")
         # wait for control process to exit
         robot_process.join()
+        video_flag.value = 0
         status = {'status': 'exit'}
         os.kill(os.getpid(), signal.SIGINT)
     else:
