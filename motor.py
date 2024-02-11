@@ -1,16 +1,13 @@
 from trilobot import *
 
 
-def dispatch_command(que, speed):
+def dispatch_command(que, run_flag, speed):
     tbot = Trilobot()
-    while True:
+    while run_flag:
         # If there is a command in the queue, dequeue and execute it
         if not que.empty():
             command = que.get()
-            if command == "exit":
-                tbot.stop()
-                break
-            elif command == "forward":
+            if command == "forward":
                 tbot.forward(speed)
             elif command == "reverse":
                 tbot.backward(speed)
@@ -28,4 +25,4 @@ def dispatch_command(que, speed):
                 tbot.set_motor_speeds(-speed, -0.7 * speed)
             else:
                 tbot.stop()
-
+    tbot.stop()

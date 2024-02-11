@@ -3,6 +3,8 @@ from picamera import PiCamera
 import cv2
 import time
 from detection import getObjects
+from trilobot import read_distance
+from math import ceil
 
 
 def processImage(img):
@@ -23,7 +25,7 @@ def processImage(img):
 
     return img, object_info
 
-def video_loop(video_que, video_flag, detect=False):
+def video_loop(video_que, distance, video_flag, detect=False):
     frame_count = 0
     start_time = time.time()
 
@@ -49,6 +51,18 @@ def video_loop(video_que, video_flag, detect=False):
         fps = round(frame_count / (time.time() - start_time), 2)
         cv2.putText(img, str(fps) + " FPS", (20, 20), 
                         cv2.FONT_HERSHEY_SIMPLEX, .5, (0, 0, 255), 2)
-        
+
+        # annotate distance
+        cv2.putText(img, str(distance.value) + " cm", (20, 40), 
+                        cv2.FONT_HERSHEY_SIMPLEX, .5, (0, 0, 255), 2)
+               
         video_que.put(img)
         raw_capture.truncate(0)
+
+def sensor_loop(distance, threshold, motor_que, run_flag):
+    while run_flag:
+        distance.value = ceil(read_distance())
+        if distance.value <= threshold:
+            motor_que.put("turn-right")
+        else:
+            motor_que.put("forward")

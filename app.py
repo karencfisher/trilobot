@@ -3,61 +3,65 @@ import cv2
 import time
 import threading
 from multiprocessing import Process, Queue, Value
-from camera import getObjects, processImage, video_loop
-from control import dispatch_command
+from sensors import getObjects, processImage, video_loop, sensor_loop
+from motor import dispatch_command
 import json
 import os
 import signal
 
-app = Flask(__name__)
-
-# Initialize the camera only once
-camera_initialized = False
-camera_lock = threading.Lock()
-video_process = None
-video_que = None
-video_flag = None
 
 # Controller globals
 SPEED = 0.7
+THRESHOLD = 20
+app = Flask(__name__)
+
+# Initialize the robot only once
 robot_initialized = False
 robot_lock = threading.Lock()
-robot_process = None
+video_process = None
+video_que = None
+video_flag = None
+motor_process = None
+sensor_process = None
 command_que = None
+distance = None
+run_flag = None
 
-def initialize_camera():
-    global camera_initialized
-    with camera_lock:
-        if not camera_initialized:
-            global video_flag
+def initialize_robot():
+    global robot_initialized
+    with robot_lock:
+        if not robot_initialized:
+            global run_flag
             global video_process
             global video_que
-            video_que = Queue()
-            video_flag = Value('i', 1)
-            video_process = Process(target=video_loop, args=(video_que, video_flag))
-            video_process.start()
-            camera_initialized = True
-
-def initialize_robot(speed):
-    # Lock to only allow a single thread to run this code at one time
-    with robot_lock:
-        global robot_initialized
-        # Only initialize the processs to control Trilobot once in a thread
-        if not robot_initialized:
-            global robot_process
+            global distance
+            global motor_process
             global command_que
-            # queue to push commands to the control process
+
+            distance = Value('i', 0)
+            run_flag = Value('i', 1)
+            video_que = Queue()
             command_que = Queue()
-            # Initialize and start the process
-            robot_process = Process(target=dispatch_command, args=(command_que, 
-                                                                   SPEED))
-            robot_process.start()
+
+            # initialize video_process
+            video_process = Process(target=video_loop, args=(video_que, distance, run_flag))
+            video_process.start()
+
+            # initialize sensor process
+            sensor_process = Process(target=sensor_loop, args=(distance, THRESHOLD, 
+                                                               command_que, run_flag))
+            sensor_process.start()
+
+            # Initialize motor process
+            motor_process = Process(target=dispatch_command, args=(command_que, 
+                                                                   run_flag, SPEED))
+            motor_process.start()
             robot_initialized = True
 
 def generate_frames():
-    initialize_camera()
+    initialize_robot()
     time.sleep(.1)
-    while video_flag.value:
+    while run_flag.value:
         if video_que is None or video_que.empty():
             continue
         img = video_que.get(False)    
@@ -69,7 +73,6 @@ def generate_frames():
         # Yield the frame data as bytes
         yield (b'--frame\r\n'
             b'Content-Type: image/jpeg\r\n\r\n' + frame_data + b'\r\n')
-    video_process.join()
 
 # Route to load the webpage
 @app.route('/')
@@ -84,14 +87,13 @@ def video_feed():
 # Route for remote controls (you can adapt this as needed)
 @app.route('/controls')
 def remote_controls():
-    initialize_robot(SPEED)
     command = request.args.get("command")
     if command == "exit":
         # push "exit" command
-        command_que.put("exit")
-        # wait for control process to exit
-        robot_process.join()
-        video_flag.value = 0
+        run_flag.value = 0
+        motor_process.join()
+        sensor_process.join()
+        video_process.join()
         status = {'status': 'exit'}
         os.kill(os.getpid(), signal.SIGINT)
     else:
