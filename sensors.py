@@ -60,9 +60,12 @@ def video_loop(video_que, distance, video_flag, detect=False):
         raw_capture.truncate(0)
 
 def sensor_loop(distance, threshold, motor_que, run_flag):
+    obstacle_detected = False
     while run_flag:
         distance.value = ceil(read_distance())
         if distance.value <= threshold:
             motor_que.put("turn-right")
-        else:
+            obstacle_detected = True
+        elif obstacle_detected:
             motor_que.put("forward")
+            obstacle_detected = False
