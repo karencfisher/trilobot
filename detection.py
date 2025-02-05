@@ -18,9 +18,10 @@ def getObjects(img, objects):
     classIds, confs, bbox = net.detect(img, confThreshold=THREASHOLD, nmsThreshold=0.2)
     objectInfo = []
     if len(classIds) != 0:
-        for classId, _, box in zip(classIds.flatten(), confs.flatten(), bbox):
-            className = class_names[classId - 1]
-            # if className in objects:
-            #     objectInfo.append([box, className])
-        objectInfo.append([box, className])
+        for classId, conf, box in zip(classIds.flatten(), confs.flatten(), bbox):
+            if conf >= 0.5:
+                className = class_names[classId - 1]
+                # if className in objects:
+                #     objectInfo.append([box, className])
+                objectInfo.append([box, className])
     return objectInfo
